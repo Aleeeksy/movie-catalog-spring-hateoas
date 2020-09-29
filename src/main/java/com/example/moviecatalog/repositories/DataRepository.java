@@ -16,11 +16,6 @@ public class DataRepository implements MovieRepository, DirectorRepository {
     private List<Movie> movies;
     private List<Director> directors;
 
-    public DataRepository() {
-        initDirectors();
-        initMovies();
-    }
-
     private void initDirectors() {
         directors = new LinkedList<>();
 
@@ -47,6 +42,7 @@ public class DataRepository implements MovieRepository, DirectorRepository {
     }
 
     private void initMovies() {
+        initDirectors();
         movies = new LinkedList<>();
 
         movies.add(Movie.builder()
