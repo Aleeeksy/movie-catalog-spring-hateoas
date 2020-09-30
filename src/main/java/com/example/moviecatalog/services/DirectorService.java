@@ -1,12 +1,25 @@
 package com.example.moviecatalog.services;
 
 import com.example.moviecatalog.models.Director;
+import com.example.moviecatalog.repositories.DirectorRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface DirectorService {
-    List<Director> getAllDirectors();
+@Service
+public class DirectorService {
+    private final DirectorRepository directorRepository;
 
-    Optional<Director> getDirectorById(String id);
+    public DirectorService(DirectorRepository directorRepository) {
+        this.directorRepository = directorRepository;
+    }
+
+    public List<Director> getAllDirectors() {
+        return directorRepository.getAllDirectors();
+    }
+
+    public Optional<Director> getDirectorById(String id) {
+        return directorRepository.getDirectorById(id);
+    }
 }

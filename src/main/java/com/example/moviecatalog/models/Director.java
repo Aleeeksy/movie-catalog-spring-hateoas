@@ -1,13 +1,15 @@
 package com.example.moviecatalog.models;
 
-import lombok.*;
-import org.springframework.hateoas.RepresentationModel;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 @Builder
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
-public class Director extends RepresentationModel<Director> {
+public class Director {
     private String id;
     private String firstname;
     private String lastname;

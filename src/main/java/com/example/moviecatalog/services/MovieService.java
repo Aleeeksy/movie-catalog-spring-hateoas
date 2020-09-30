@@ -1,14 +1,29 @@
 package com.example.moviecatalog.services;
 
 import com.example.moviecatalog.models.Movie;
+import com.example.moviecatalog.repositories.MovieRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface MovieService {
-    List<Movie> getAllMovies();
+@Service
+public class MovieService {
+    private final MovieRepository movieRepository;
 
-    Optional<Movie> getMovieById(String id);
+    public MovieService(MovieRepository movieRepository) {
+        this.movieRepository = movieRepository;
+    }
 
-    List<Movie> getMoviesByDirectorId(String directorId);
+    public List<Movie> getAllMovies() {
+        return movieRepository.getAllMovies();
+    }
+
+    public Optional<Movie> getMovieById(String id) {
+        return movieRepository.getMovieById(id);
+    }
+
+    public List<Movie> getMoviesByDirectorId(String directorId) {
+        return movieRepository.getMoviesByDirectorId(directorId);
+    }
 }

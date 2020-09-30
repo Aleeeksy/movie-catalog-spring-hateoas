@@ -5,20 +5,20 @@ import com.example.moviecatalog.models.Movie;
 import com.example.moviecatalog.models.Rating;
 import org.springframework.stereotype.Repository;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
 public class DataRepository implements MovieRepository, DirectorRepository {
-    private List<Movie> movies;
-    private List<Director> directors;
+    private final List<Movie> movies = new ArrayList<>();
+    private final List<Director> directors = new ArrayList<>();
+
+    DataRepository() {
+        initDirectors();
+        initMovies();
+    }
 
     private void initDirectors() {
-        directors = new LinkedList<>();
-
         directors.add(Director.builder()
                 .id("D0001")
                 .firstname("Sergio")
@@ -42,9 +42,6 @@ public class DataRepository implements MovieRepository, DirectorRepository {
     }
 
     private void initMovies() {
-        initDirectors();
-        movies = new LinkedList<>();
-
         movies.add(Movie.builder()
                 .id("M0001")
                 .title("Once Upon a Time in the West")
@@ -119,12 +116,10 @@ public class DataRepository implements MovieRepository, DirectorRepository {
     }
 
     private List<Movie> getMovies() {
-        initMovies();
         return movies;
     }
 
     private List<Director> getDirectors() {
-        initDirectors();
         return directors;
     }
 
