@@ -14,7 +14,7 @@ public class RootController {
     public ResponseEntity<RepresentationModel<?>> getRoot() {
         RepresentationModel<?> representationModel = new RepresentationModel<>();
         representationModel.add(linkTo(methodOn(RootController.class).getRoot()).withSelfRel());
-        representationModel.add(linkTo(methodOn(DirectorController.class).getAllDirectors()).withRel("direcotrs"));
+        representationModel.add(linkTo(methodOn(DirectorController.class).getAllDirectors()).withRel("directors"));
         representationModel.add(linkTo(methodOn(MovieController.class).getAllMovies()).withRel("movies"));
         return ResponseEntity.ok(representationModel);
     }
