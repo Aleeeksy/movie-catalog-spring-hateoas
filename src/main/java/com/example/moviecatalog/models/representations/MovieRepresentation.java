@@ -1,4 +1,4 @@
-package com.example.moviecatalog.models.resources;
+package com.example.moviecatalog.models.representations;
 
 import com.example.moviecatalog.models.Rating;
 import lombok.Builder;
@@ -11,10 +11,10 @@ import java.util.Set;
 @Builder
 @Getter
 @EqualsAndHashCode(callSuper = false)
-public class MovieResource extends RepresentationModel<MovieResource> {
+public class MovieRepresentation extends RepresentationModel<MovieRepresentation> {
     private final String id;
     private final String title;
     private final int year;
     private final Rating rating;
-    private final Set<DirectorResource> directors;
+    private final Set<DirectorRepresentation> directors;
 }

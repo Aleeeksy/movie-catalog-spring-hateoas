@@ -1,4 +1,4 @@
-package com.example.moviecatalog.models.resources;
+package com.example.moviecatalog.models.representations;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -8,7 +8,7 @@ import org.springframework.hateoas.RepresentationModel;
 @Builder
 @Getter
 @EqualsAndHashCode(callSuper = false)
-public class DirectorResource extends RepresentationModel<DirectorResource> {
+public class DirectorRepresentation extends RepresentationModel<DirectorRepresentation> {
     private final String id;
     private final String firstname;
     private final String lastname;

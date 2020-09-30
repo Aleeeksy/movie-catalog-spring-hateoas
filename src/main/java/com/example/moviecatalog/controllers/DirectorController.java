@@ -1,9 +1,9 @@
 package com.example.moviecatalog.controllers;
 
-import com.example.moviecatalog.assemblers.DirectorResourceAssembler;
-import com.example.moviecatalog.assemblers.MovieResourceAssembler;
-import com.example.moviecatalog.models.resources.DirectorResource;
-import com.example.moviecatalog.models.resources.MovieResource;
+import com.example.moviecatalog.assemblers.DirectorRepresentationAssembler;
+import com.example.moviecatalog.assemblers.MovieRepresentationAssembler;
+import com.example.moviecatalog.models.representations.DirectorRepresentation;
+import com.example.moviecatalog.models.representations.MovieRepresentation;
 import com.example.moviecatalog.services.DirectorService;
 import com.example.moviecatalog.services.MovieService;
 import org.springframework.hateoas.CollectionModel;
@@ -25,39 +25,39 @@ public class DirectorController {
 
     private final DirectorService directorService;
     private final MovieService movieService;
-    private final DirectorResourceAssembler directorResourceAssembler;
-    private final MovieResourceAssembler movieResourceAssembler;
+    private final DirectorRepresentationAssembler directorRepresentationAssembler;
+    private final MovieRepresentationAssembler movieRepresentationAssembler;
 
     public DirectorController(DirectorService directorService, MovieService movieService,
-                              DirectorResourceAssembler directorResourceAssembler,
-                              MovieResourceAssembler movieResourceAssembler) {
+                              DirectorRepresentationAssembler directorRepresentationAssembler,
+                              MovieRepresentationAssembler movieRepresentationAssembler) {
         this.directorService = directorService;
         this.movieService = movieService;
-        this.directorResourceAssembler = directorResourceAssembler;
-        this.movieResourceAssembler = movieResourceAssembler;
+        this.directorRepresentationAssembler = directorRepresentationAssembler;
+        this.movieRepresentationAssembler = movieRepresentationAssembler;
     }
 
     @GetMapping
-    public ResponseEntity<CollectionModel<DirectorResource>> getAllDirectors() {
-        return ResponseEntity.ok(directorResourceAssembler.toCollectionModel(directorService.getAllDirectors()));
+    public ResponseEntity<CollectionModel<DirectorRepresentation>> getAllDirectors() {
+        return ResponseEntity.ok(directorRepresentationAssembler.toCollectionModel(directorService.getAllDirectors()));
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<DirectorResource> getDirectorById(@PathVariable("id") String id) {
+    public ResponseEntity<DirectorRepresentation> getDirectorById(@PathVariable("id") String id) {
         return directorService.getDirectorById(id)
                 .map(director -> {
-                    DirectorResource directorResource = directorResourceAssembler.toModel(director)
+                    DirectorRepresentation directorRepresentation = directorRepresentationAssembler.toModel(director)
                             .add(linkTo(methodOn(DirectorController.class)
                                     .getDirectorMovies(director.getId())).withRel(DIRECTOR_MOVIES))
                             .add(linkTo(methodOn(DirectorController.class).getAllDirectors()).withRel(ALL_DIRECTORS));
-                    return ResponseEntity.ok(directorResource);
+                    return ResponseEntity.ok(directorRepresentation);
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping(value = "/{id}/movies")
-    public ResponseEntity<CollectionModel<MovieResource>> getDirectorMovies(@PathVariable("id") String id) {
-        CollectionModel<MovieResource> directorMovies = movieResourceAssembler.toCollectionModel(movieService.getMoviesByDirectorId(id))
+    public ResponseEntity<CollectionModel<MovieRepresentation>> getDirectorMovies(@PathVariable("id") String id) {
+        CollectionModel<MovieRepresentation> directorMovies = movieRepresentationAssembler.toCollectionModel(movieService.getMoviesByDirectorId(id))
                 .add(linkTo(methodOn(DirectorController.class).getDirectorMovies(id)).withSelfRel())
                 .add(linkTo(methodOn(MovieController.class).getAllMovies()).withRel(ALL_MOVIES));
         return ResponseEntity.ok(directorMovies);
