@@ -1,7 +1,6 @@
 package com.example.moviecatalog.assemblers;
 
 import com.example.moviecatalog.controllers.DirectorController;
-import com.example.moviecatalog.controllers.MovieController;
 import com.example.moviecatalog.models.Director;
 import com.example.moviecatalog.models.resources.DirectorResource;
 import org.springframework.hateoas.CollectionModel;
@@ -31,7 +30,7 @@ public class DirectorResourceAssembler implements RepresentationModelAssembler<D
     public CollectionModel<DirectorResource> toCollectionModel(Iterable<? extends Director> entities) {
         CollectionModel<DirectorResource> directorResources = RepresentationModelAssembler.super.toCollectionModel(entities);
 
-        directorResources.add(linkTo(methodOn(MovieController.class).getAllMovies()).withSelfRel());
+        directorResources.add(linkTo(methodOn(DirectorController.class).getAllDirectors()).withSelfRel());
 
         return directorResources;
     }
