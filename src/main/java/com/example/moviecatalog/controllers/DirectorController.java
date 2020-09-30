@@ -1,10 +1,9 @@
 package com.example.moviecatalog.controllers;
 
-import com.example.moviecatalog.models.Director;
-import com.example.moviecatalog.models.Movie;
+import com.example.moviecatalog.models.*;
 import com.example.moviecatalog.services.DirectorService;
 import com.example.moviecatalog.services.MovieService;
-import com.example.moviecatalog.utils.LinkHelper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
@@ -20,50 +19,33 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(value = "/directors")
 public class DirectorController {
-    private static final String DIRECTOR_MOVIES = "directorMovies";
-
     private final DirectorService directorService;
     private final MovieService movieService;
-
-    public DirectorController(DirectorService directorService, MovieService movieService) {
-        this.directorService = directorService;
-        this.movieService = movieService;
-    }
+    private final DirectorAssembler directorAssembler;
+    private final MovieAssembler movieAssembler;
 
     @GetMapping
-    public ResponseEntity<CollectionModel<Director>> getAllDirectors() {
+    public ResponseEntity<?> getAllDirectors() {
         List<Director> directors = directorService.getAllDirectors();
-        LinkHelper.addSelfDirectorLink(directors);
-        return ResponseEntity.ok(CollectionModel.of(directors, LinkHelper.getAllDirectorsLink()));
+        return ResponseEntity.ok(directorAssembler.toCollectionModel(directors));
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<EntityModel<Director>> getDirectorById(@PathVariable("id") String id) {
+    public ResponseEntity<?> getDirectorById(@PathVariable("id") Long id) {
         return directorService.getDirectorById(id)
-                .map(director -> {
-                    Link directorMoviesLink = linkTo(methodOn(DirectorController.class).getDirectorMovies(director.getId())).withRel(DIRECTOR_MOVIES);
-                    director.add(LinkHelper.getSelfDirectorLink(director.getId()), directorMoviesLink, LinkHelper.getAllDirectorsLink());
-                    return ResponseEntity.ok(EntityModel.of(director));
-                })
+                .map(director -> ResponseEntity.ok(directorAssembler.toModel(director)))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping(value = "/{id}/movies")
-    public ResponseEntity<CollectionModel<Movie>> getDirectorMovies(@PathVariable("id") String id) {
+    public ResponseEntity<?> getDirectorMovies(@PathVariable("id") Long id) {
         List<Movie> directorMovies = movieService.getMoviesByDirectorId(id);
-        Link selfLink = linkTo(methodOn(DirectorController.class).getDirectorMovies(id)).withSelfRel();
-        addSelfMovieLinks(directorMovies);
-        addDirectorsLinks(directorMovies);
-        return ResponseEntity.ok(CollectionModel.of(directorMovies, selfLink, LinkHelper.getAllDirectorsLink(), LinkHelper.getAllMoviesLink()));
+        CollectionModel<EntityModel<Movie>> directorMoviesCollectionModel = movieAssembler.toCollectionModel(directorMovies);
+        directorMoviesCollectionModel.add(linkTo(methodOn(DirectorController.class).getDirectorById(id)).withRel("director"));
+        return ResponseEntity.ok(directorMoviesCollectionModel);
     }
 
-    private void addSelfMovieLinks(List<Movie> movies) {
-        movies.forEach(LinkHelper::addSelfMovieLink);
-    }
-
-    private void addDirectorsLinks(List<Movie> movies) {
-        movies.forEach(movie -> LinkHelper.addSelfDirectorLink(movie.getDirectors()));
-    }
 }

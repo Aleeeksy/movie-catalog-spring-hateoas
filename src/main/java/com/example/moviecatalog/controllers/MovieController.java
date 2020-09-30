@@ -1,8 +1,9 @@
 package com.example.moviecatalog.controllers;
 
 import com.example.moviecatalog.models.Movie;
+import com.example.moviecatalog.models.MovieAssembler;
 import com.example.moviecatalog.services.MovieService;
-import com.example.moviecatalog.utils.LinkHelper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
@@ -12,34 +13,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/movies")
+@RequiredArgsConstructor
 public class MovieController {
-    private final MovieService movieService;
 
-    public MovieController(MovieService movieService) {
-        this.movieService = movieService;
-    }
+    private final MovieService movieService;
+    private final MovieAssembler movieAssembler;
 
     @GetMapping
-    public ResponseEntity<CollectionModel<Movie>> getAllMovies() {
-        List<Movie> movies = movieService.getAllMovies();
-        movies.forEach(movie -> {
-            LinkHelper.addSelfMovieLink(movie);
-            LinkHelper.addSelfDirectorLink(movie.getDirectors());
-        });
-        return ResponseEntity.ok(CollectionModel.of(movies, LinkHelper.getAllMoviesLink()));
+    public ResponseEntity<CollectionModel<EntityModel<Movie>>> getAllMovies() {
+        List<Movie> allMovies = movieService.getAllMovies();
+        CollectionModel<EntityModel<Movie>> entityModels = movieAssembler.toCollectionModel(allMovies);
+        return ResponseEntity.ok(entityModels);
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<EntityModel<Movie>> getMovieById(@PathVariable("id") String id) {
-        return movieService.getMovieById(id)
-                .map(movie -> {
-                    LinkHelper.addSelfMovieLink(movie);
-                    LinkHelper.addSelfDirectorLink(movie.getDirectors());
-                    return ResponseEntity.ok(EntityModel.of(movie, LinkHelper.getAllMoviesLink()));
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<EntityModel<Movie>> getMovieById(@PathVariable("id") Long id) {
+        Optional<Movie> movieById = movieService.getMovieById(id);
+        return movieById.map(movie -> {
+            EntityModel<Movie> entityModel = movieAssembler.toModel(movie);
+            return ResponseEntity.ok(entityModel);
+        }).orElse(ResponseEntity.notFound().build());
     }
 }
